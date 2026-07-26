@@ -1,0 +1,6 @@
+artifact_location: file:///home/runner/work/Workflow-CI/Workflow-CI/MLProject/mlruns/985313043894699335
+creation_time: 1785066828238
+experiment_id: '985313043894699335'
+last_update_time: 1785066828238
+lifecycle_stage: active
+name: Telco Churn - CI Retraining
