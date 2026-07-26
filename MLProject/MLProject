@@ -1,0 +1,33 @@
+name: telco-churn-msml
+
+conda_env: conda.yaml
+
+entry_points:
+  main:
+    parameters:
+      data_path:
+        type: str
+        default: "telco_churn_preprocessing/telco_churn_preprocessed.csv"
+      n_estimators:
+        type: int
+        default: 200
+      max_depth:
+        type: int
+        default: 20
+      min_samples_split:
+        type: int
+        default: 2
+      test_size:
+        type: float
+        default: 0.2
+      random_state:
+        type: int
+        default: 42
+    command: >
+      python modelling.py
+      --data_path {data_path}
+      --n_estimators {n_estimators}
+      --max_depth {max_depth}
+      --min_samples_split {min_samples_split}
+      --test_size {test_size}
+      --random_state {random_state}

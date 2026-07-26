@@ -1,0 +1,126 @@
+name: CI - MLflow Project Retraining
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    # Re-training terjadwal setiap Senin 01:00 UTC.
+    - cron: "0 1 * * 1"
+  workflow_dispatch:
+    inputs:
+      n_estimators:
+        description: "Jumlah pohon RandomForest"
+        default: "200"
+      max_depth:
+        description: "Kedalaman maksimum pohon (0 = tanpa batas)"
+        default: "20"
+
+permissions:
+  contents: write
+
+env:
+  # Tracking store lokal di dalam workspace, dipakai bersama oleh semua step.
+  MLFLOW_TRACKING_URI: file://${{ github.workspace }}/MLProject/mlruns
+  IMAGE_NAME: telco-churn-model
+  # Diangkat ke env agar step Docker bisa dilewati lewat `env.DOCKERHUB_USERNAME`
+  # ketika secrets belum diisi (context `secrets` tidak andal di `if:` step).
+  DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Run actions/checkout@v4
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12.7
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12.7"
+
+      - name: Check Env
+        run: |
+          echo "python  : $(python --version)"
+          echo "pip     : $(pip --version)"
+          echo "workdir : $(pwd)"
+          echo "tracking: $MLFLOW_TRACKING_URI"
+          ls -R MLProject | head -30
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install mlflow==2.19.0 scikit-learn==1.6.0 pandas==2.2.3 \
+            numpy==2.2.1 joblib==1.4.2 matplotlib==3.10.0 seaborn==0.13.2
+
+      - name: Run mlflow project
+        working-directory: MLProject
+        run: |
+          mlflow run . --env-manager=local \
+            --experiment-name "Telco Churn - CI Retraining" \
+            -P n_estimators=${{ github.event.inputs.n_estimators || 200 }} \
+            -P max_depth=${{ github.event.inputs.max_depth || 20 }}
+
+      - name: Get latest MLflow run_id
+        id: run_id
+        working-directory: MLProject
+        run: |
+          RUN_ID=$(cat run_id.txt)
+          echo "RUN_ID=$RUN_ID" >> $GITHUB_ENV
+          echo "run_id=$RUN_ID" >> $GITHUB_OUTPUT
+          echo "MLflow run_id: $RUN_ID"
+          cat ci_metrics.json
+
+      - name: Upload to GitHub
+        uses: actions/upload-artifact@v4
+        with:
+          name: mlflow-artifacts-${{ steps.run_id.outputs.run_id }}
+          path: |
+            MLProject/mlruns/
+            MLProject/ci_metrics.json
+            MLProject/run_id.txt
+          retention-days: 90
+
+      - name: Commit artifacts back to repository
+        if: github.event_name != 'pull_request'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -f MLProject/mlruns MLProject/ci_metrics.json MLProject/run_id.txt
+          if git diff --staged --quiet; then
+            echo "Tidak ada perubahan artefak."
+          else
+            git commit -m "ci: artefak hasil re-training run ${RUN_ID} [skip ci]"
+            git push
+          fi
+
+      - name: Log in to Docker Hub
+        if: github.event_name != 'pull_request' && env.DOCKERHUB_USERNAME != ''
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build Docker Model
+        if: github.event_name != 'pull_request' && env.DOCKERHUB_USERNAME != ''
+        working-directory: MLProject
+        run: |
+          mlflow models build-docker \
+            --model-uri "runs:/${RUN_ID}/model" \
+            --name "${IMAGE_NAME}"
+
+      - name: Tag Docker Image
+        if: github.event_name != 'pull_request' && env.DOCKERHUB_USERNAME != ''
+        run: |
+          docker tag ${IMAGE_NAME}:latest ${DOCKERHUB_USERNAME}/${IMAGE_NAME}:latest
+          docker tag ${IMAGE_NAME}:latest ${DOCKERHUB_USERNAME}/${IMAGE_NAME}:${RUN_ID}
+          docker images | grep ${IMAGE_NAME}
+
+      - name: Push Docker Image
+        if: github.event_name != 'pull_request' && env.DOCKERHUB_USERNAME != ''
+        run: |
+          docker push ${DOCKERHUB_USERNAME}/${IMAGE_NAME}:latest
+          docker push ${DOCKERHUB_USERNAME}/${IMAGE_NAME}:${RUN_ID}
+          echo "Image tersedia di https://hub.docker.com/r/${DOCKERHUB_USERNAME}/${IMAGE_NAME}"

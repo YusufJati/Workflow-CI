@@ -1,0 +1,14 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.DS_Store
+
+# Tracking store hasil menjalankan MLflow Project di mesin lokal. Diabaikan agar
+# push awal tidak membawa model.pkl 37 MB dari percobaan lokal. Workflow CI tetap
+# memasukkannya ke repository lewat `git add -f` pada step
+# "Commit artifacts back to repository" (Kriteria 3 - Skilled), sehingga artefak
+# yang ter-commit selalu berasal dari run CI, bukan dari mesin lokal.
+mlruns/
+run_id.txt
+ci_metrics.json

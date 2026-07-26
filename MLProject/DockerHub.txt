@@ -1,0 +1,50 @@
+Tautan Docker Hub - Model Telco Customer Churn
+==============================================
+
+Repository image :
+https://hub.docker.com/r/<USERNAME_DOCKERHUB>/telco-churn-model
+
+Tag yang dipublikasikan oleh workflow CI:
+    <USERNAME_DOCKERHUB>/telco-churn-model:latest
+    <USERNAME_DOCKERHUB>/telco-churn-model:<mlflow_run_id>
+
+
+!!! WAJIB DIISI SEBELUM SUBMIT !!!
+Ganti <USERNAME_DOCKERHUB> dengan username Docker Hub Anda. Image baru muncul
+setelah secrets DOCKERHUB_USERNAME dan DOCKERHUB_TOKEN diisi di repository
+GitHub dan workflow CI berjalan sampai step "Push Docker Image".
+
+
+Cara image dibangun (step "Build Docker Model" pada CI)
+-------------------------------------------------------
+    mlflow models build-docker \
+        --model-uri "runs:/${RUN_ID}/model" \
+        --name "telco-churn-model"
+
+
+Cara memakai image
+------------------
+    docker pull <USERNAME_DOCKERHUB>/telco-churn-model:latest
+    docker run -p 5002:8080 <USERNAME_DOCKERHUB>/telco-churn-model:latest
+
+Endpoint scoring akan tersedia di http://127.0.0.1:5002/invocations
+(port di dalam container adalah 8080).
+
+Contoh permintaan prediksi:
+
+    curl -X POST http://127.0.0.1:5002/invocations \
+      -H "Content-Type: application/json" \
+      -d '{"dataframe_split": {"columns": ["gender", "SeniorCitizen", ...],
+                               "data": [[1, 0, ...]]}}'
+
+Daftar 30 nama kolom yang harus dikirim tersimpan di
+telco_churn_preprocessing/metadata.json pada key "feature_names", dan skrip
+"Monitoring dan Logging/7.inference.py" sudah menyusun payload ini otomatis.
+
+
+Membangun image secara lokal (tanpa CI)
+---------------------------------------
+    cd MLProject
+    mlflow models build-docker \
+        --model-uri "mlruns/837148795332555298/bf782e5c313343aea618e295f6a05e1c/artifacts/model" \
+        --name telco-churn-model
