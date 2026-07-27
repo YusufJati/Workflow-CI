@@ -6,10 +6,10 @@
   "roc_auc": 0.818535741042135,
   "log_loss": 0.49660971346144167,
   "balanced_accuracy": 0.6922201555193882,
-  "average_precision": 0.6206035160252552,
+  "average_precision": 0.6206064951860256,
   "matthews_corrcoef": 0.4231549881493307,
   "specificity": 0.9004830917874396,
   "ks_statistic": 0.4876798677310186,
   "train_accuracy": 0.9982250621228257,
-  "fit_time_seconds": 0.42480884799999785
+  "fit_time_seconds": 0.5410562229999982
 }
