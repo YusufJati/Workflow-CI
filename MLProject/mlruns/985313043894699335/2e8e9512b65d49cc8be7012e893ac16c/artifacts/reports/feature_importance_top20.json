@@ -1,0 +1,82 @@
+[
+  {
+    "feature": "TotalCharges",
+    "importance": 0.19487862123527605
+  },
+  {
+    "feature": "tenure",
+    "importance": 0.17007259384753248
+  },
+  {
+    "feature": "MonthlyCharges",
+    "importance": 0.1636356483768942
+  },
+  {
+    "feature": "PaymentMethod_Electronic check",
+    "importance": 0.036599231772801596
+  },
+  {
+    "feature": "InternetService_Fiber optic",
+    "importance": 0.036023987864449304
+  },
+  {
+    "feature": "Contract_Two year",
+    "importance": 0.03139871052441558
+  },
+  {
+    "feature": "gender",
+    "importance": 0.028696404044700058
+  },
+  {
+    "feature": "OnlineSecurity_Yes",
+    "importance": 0.027386666148000335
+  },
+  {
+    "feature": "PaperlessBilling",
+    "importance": 0.0262760774165075
+  },
+  {
+    "feature": "TechSupport_Yes",
+    "importance": 0.024045219407906982
+  },
+  {
+    "feature": "Partner",
+    "importance": 0.023306997616932043
+  },
+  {
+    "feature": "Contract_One year",
+    "importance": 0.02281306211732471
+  },
+  {
+    "feature": "OnlineBackup_Yes",
+    "importance": 0.022493747423758034
+  },
+  {
+    "feature": "SeniorCitizen",
+    "importance": 0.021102745034790357
+  },
+  {
+    "feature": "MultipleLines_Yes",
+    "importance": 0.0202935072984175
+  },
+  {
+    "feature": "DeviceProtection_Yes",
+    "importance": 0.019689624924491663
+  },
+  {
+    "feature": "Dependents",
+    "importance": 0.01939278783823506
+  },
+  {
+    "feature": "StreamingMovies_Yes",
+    "importance": 0.018286736852853827
+  },
+  {
+    "feature": "StreamingTV_Yes",
+    "importance": 0.017086597700145558
+  },
+  {
+    "feature": "PaymentMethod_Credit card (automatic)",
+    "importance": 0.013260424556248524
+  }
+]
