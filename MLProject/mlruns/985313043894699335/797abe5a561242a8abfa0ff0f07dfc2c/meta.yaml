@@ -1,0 +1,15 @@
+artifact_uri: file:///home/runner/work/Workflow-CI/Workflow-CI/MLProject/mlruns/985313043894699335/797abe5a561242a8abfa0ff0f07dfc2c/artifacts
+end_time: 1792994096833
+entry_point_name: ''
+experiment_id: '985313043894699335'
+lifecycle_stage: active
+run_id: 797abe5a561242a8abfa0ff0f07dfc2c
+run_name: ci_retraining
+run_uuid: 797abe5a561242a8abfa0ff0f07dfc2c
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1792994085909
+status: 3
+tags: []
+user_id: runner
